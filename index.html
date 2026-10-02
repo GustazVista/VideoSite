@@ -227,6 +227,35 @@
   /* ---------- 1. SURPRISE: confetti + reveal ---------- */
   const COLORS = ["#ff5c8a", "#ffb3c7", "#ffd166", "#9be7c4", "#8ecbff", "#c9a7ff", "#ff9f68"];
 
+  /* Fireworks: a rocket trail shoots up, then explodes into a round burst of sparks.
+     Tweak ROCKETS for a longer/shorter show. */
+  const FIREWORK_COLORS = ["#ff5c8a", "#ff9ebb", "#ffd166", "#ffffff", "#c9a7ff", "#8ecbff", "#ff7a59"];
+  const ROCKETS = 14;
+
+  function launchFireworks() {
+    for (let i = 0; i < ROCKETS; i++) {
+      setTimeout(() => {
+        const x = 0.12 + Math.random() * 0.76;        // where it explodes (horizontal)
+        const y = 0.15 + Math.random() * 0.35;        // where it explodes (height)
+        const hue = FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)];
+
+        // Rocket trail rising from the bottom
+        confetti({ particleCount: 14, angle: 90, spread: 3, startVelocity: 48, gravity: 0.5,
+                   decay: 0.9, ticks: 28, origin: { x, y: 1 }, colors: ["#fff3c4", "#ffd166"],
+                   shapes: ["circle"], scalar: 0.5, drift: 0 });
+
+        // Explosion
+        setTimeout(() => {
+          confetti({ particleCount: 90, spread: 360, startVelocity: 32, gravity: 0.7, decay: 0.92,
+                     ticks: 90, origin: { x, y }, colors: [hue, "#ffffff"], shapes: ["circle"], scalar: 0.9 });
+          // Little sparkle core
+          confetti({ particleCount: 25, spread: 360, startVelocity: 14, gravity: 0.5, decay: 0.9,
+                     ticks: 70, origin: { x, y }, colors: ["#fff3c4"], shapes: ["star"], scalar: 1 });
+        }, 380);
+      }, i * 230 + (i % 3) * 60);
+    }
+  }
+
   $("surpriseBtn").addEventListener("click", e => {
     // Confetti starts at the button's position on screen
     const r = e.currentTarget.getBoundingClientRect();
@@ -235,11 +264,8 @@
     if (window.confetti) {
       // Big burst from the button
       confetti({ particleCount: 160, spread: 360, startVelocity: 45, origin, colors: COLORS, ticks: 200, scalar: 1.1 });
-      // Fireworks-style bursts across the screen
-      [250, 500, 800].forEach(t => setTimeout(() => {
-        confetti({ particleCount: 70, spread: 90, startVelocity: 40, angle: 60,  origin: { x: 0, y: .75 }, colors: COLORS });
-        confetti({ particleCount: 70, spread: 90, startVelocity: 40, angle: 120, origin: { x: 1, y: .75 }, colors: COLORS });
-      }, t));
+      // Fireworks show across the whole screen
+      launchFireworks();
     }
 
     // After ~1.3s, fade the gate away and reveal the main content
