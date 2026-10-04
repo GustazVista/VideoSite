@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A little surprise for you 💖</title>
+<title>A little surprise for you 🎁</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- Confetti library (canvas-confetti 1.9.3, ISC license) is built in below, so no internet is needed for it -->
 <script>
@@ -898,24 +898,24 @@
 </script>
 
 <style>
-  /* ---------- Colour tokens: strawberry-milk palette ---------- */
+  /* ---------- Colour tokens: clean blue / slate palette ---------- */
   :root {
-    --ink:      #5c1f35;   /* deep berry text */
-    --raspberry:#e8386d;   /* main accent */
-    --rose:     #ff7a9e;   /* soft accent */
-    --blush:    #ffd6e2;   /* borders / tints */
-    --milk:     #fff4f7;   /* page background */
+    --ink:      #1f2937;   /* dark slate text */
+    --accent:#2563eb;   /* main accent (blue) */
+    --accent-soft: #60a5fa;   /* soft accent */
+    --line:     #e2e8f0;   /* borders / tints */
+    --bg:       #f8fafc;   /* page background */
     --card:     #ffffff;
-    --shadow:   0 14px 40px rgba(232, 56, 109, .18);
+    --shadow:   0 14px 40px rgba(15, 23, 42, .15);
   }
   * { box-sizing: border-box; margin: 0; }
   html, body { min-height: 100%; }
   body {
     font-family: "Nunito", system-ui, sans-serif;
     color: var(--ink);
-    background: radial-gradient(circle at 20% 10%, #ffe3ec 0, transparent 45%),
-                radial-gradient(circle at 85% 90%, #ffc9d9 0, transparent 50%),
-                var(--milk);
+    background: radial-gradient(circle at 20% 10%, #e0ecff 0, transparent 45%),
+                radial-gradient(circle at 85% 90%, #e2e8f0 0, transparent 50%),
+                var(--bg);
     background-attachment: fixed;
   }
   h1, h2, .btn-surprise { font-family: "Fredoka", "Nunito", sans-serif; }
@@ -924,21 +924,21 @@
   #gate {
     position: fixed; inset: 0; z-index: 10;
     display: grid; place-items: center; text-align: center; padding: 24px;
-    background: radial-gradient(circle at 50% 40%, #ff5c8a 0, #c2185b 55%, #7a0f3d 100%);
+    background: radial-gradient(circle at 50% 40%, #3b82f6 0, #1e40af 55%, #0f172a 100%);
     transition: opacity .9s ease, visibility .9s;
   }
   #gate.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-  #gate p { color: #ffe3ec; margin-bottom: 28px; font-weight: 600; font-size: 1.1rem; }
+  #gate p { color: #dbeafe; margin-bottom: 28px; font-weight: 600; font-size: 1.1rem; }
   .btn-surprise {
     font-size: clamp(2rem, 8vw, 3.4rem); font-weight: 700; letter-spacing: .04em;
-    color: var(--raspberry); background: #fff; border: 0; cursor: pointer;
+    color: var(--accent); background: #fff; border: 0; cursor: pointer;
     padding: .55em 1.3em; border-radius: 999px;
     box-shadow: 0 0 0 8px rgba(255,255,255,.25), 0 18px 40px rgba(0,0,0,.3);
     animation: pulse 1.8s ease-in-out infinite;
     transition: transform .2s;
   }
   .btn-surprise:hover { transform: scale(1.06) rotate(-2deg); }
-  .btn-surprise:focus-visible { outline: 4px solid #ffe3ec; outline-offset: 6px; }
+  .btn-surprise:focus-visible { outline: 4px solid #dbeafe; outline-offset: 6px; }
   @keyframes pulse { 50% { box-shadow: 0 0 0 18px rgba(255,255,255,.12), 0 18px 40px rgba(0,0,0,.3); } }
 
   /* ---------- 2. Main content ---------- */
@@ -948,30 +948,30 @@
     transition: opacity 1s ease .2s, transform 1s ease .2s;
   }
   main.show { opacity: 1; transform: none; }
-  h1 { text-align: center; font-size: clamp(1.9rem, 6vw, 2.8rem); color: var(--raspberry); }
+  h1 { text-align: center; font-size: clamp(1.9rem, 6vw, 2.8rem); color: var(--accent); }
   .sub { text-align: center; margin: 8px 0 28px; }
 
   /* Video */
   .video-wrap {
-    position: relative; aspect-ratio: 16 / 9; background: #3a1224;
+    position: relative; aspect-ratio: 16 / 9; background: #0f172a;
     border-radius: 28px; overflow: hidden; box-shadow: var(--shadow);
     border: 6px solid #fff;
   }
   video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .play-overlay {
     position: absolute; inset: 0; display: grid; place-items: center;
-    background: rgba(122, 15, 61, .25); border: 0; cursor: pointer;
+    background: rgba(15, 23, 42, .3); border: 0; cursor: pointer;
     transition: opacity .3s;
   }
   .play-overlay span {
-    width: 84px; height: 84px; border-radius: 50%; background: #fff; color: var(--raspberry);
+    width: 84px; height: 84px; border-radius: 50%; background: #fff; color: var(--accent);
     display: grid; place-items: center; font-size: 2rem; padding-left: 6px;
     box-shadow: 0 10px 30px rgba(0,0,0,.3);
   }
   .play-overlay.gone { opacity: 0; pointer-events: none; }
   .placeholder {   /* shown only if VIDEO_SRC is empty or fails to load */
     position: absolute; inset: 0; display: none; place-items: center; text-align: center;
-    padding: 20px; color: #ffe3ec; background: #7a0f3d;
+    padding: 20px; color: #e2e8f0; background: #1e293b;
   }
   .placeholder.on { display: grid; }
   .placeholder code { background: rgba(255,255,255,.15); padding: 2px 8px; border-radius: 8px; }
@@ -982,26 +982,26 @@
   form { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
   input[type=text] {
     flex: 1 1 220px; font: inherit; padding: 14px 20px; color: var(--ink);
-    border: 2px solid var(--blush); border-radius: 999px; background: #fff; outline: none;
+    border: 2px solid var(--line); border-radius: 999px; background: #fff; outline: none;
     transition: border-color .2s, box-shadow .2s;
   }
-  input[type=text]:focus { border-color: var(--rose); box-shadow: 0 0 0 5px rgba(255,122,158,.2); }
+  input[type=text]:focus { border-color: var(--accent-soft); box-shadow: 0 0 0 5px rgba(96,165,250,.25); }
   .btn-send {
     font: 700 1rem "Nunito", sans-serif; color: #fff; cursor: pointer; border: 0;
-    padding: 14px 28px; border-radius: 999px; background: linear-gradient(135deg, var(--rose), var(--raspberry));
-    box-shadow: 0 8px 20px rgba(232,56,109,.3); transition: transform .15s, box-shadow .15s;
+    padding: 14px 28px; border-radius: 999px; background: linear-gradient(135deg, var(--accent-soft), var(--accent));
+    box-shadow: 0 8px 20px rgba(37,99,235,.3); transition: transform .15s, box-shadow .15s;
   }
   .btn-send:hover { transform: translateY(-2px); }
   .btn-send:active { transform: scale(.96); }
   .btn-send:focus-visible, .mute:focus-visible, .play-overlay:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-  .thanks { text-align: center; height: 1.6em; margin-top: 12px; font-weight: 700; color: var(--raspberry); opacity: 0; }
+  .thanks { text-align: center; height: 1.6em; margin-top: 12px; font-weight: 700; color: var(--accent); opacity: 0; }
   .thanks.pop { animation: pop 1.8s ease; }
   @keyframes pop { 0% { opacity: 0; transform: scale(.6); } 15% { opacity: 1; transform: scale(1.15); } 30%, 80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
 
   ul { list-style: none; padding: 0; margin-top: 12px; display: grid; gap: 12px; }
   li {
     background: var(--card); border-radius: 20px 20px 20px 6px; padding: 14px 18px;
-    box-shadow: 0 6px 18px rgba(232,56,109,.12); overflow-wrap: anywhere;
+    box-shadow: 0 6px 18px rgba(15,23,42,.08); overflow-wrap: anywhere;
   }
   li.new { animation: drop .6s cubic-bezier(.3, 1.6, .5, 1); }
   li time { display: block; font-size: .78rem; opacity: .6; margin-top: 4px; }
@@ -1009,7 +1009,7 @@
   .empty { text-align: center; opacity: .65; margin-top: 14px; }
 
   footer { text-align: center; padding: 32px 20px 40px; font-size: .95rem; }
-  footer b { color: var(--raspberry); }
+  footer b { color: var(--accent); }
 
   /* Music mute button (hidden until the surprise is clicked) */
   .mute {
@@ -1029,15 +1029,14 @@
 <!-- ========== 1. GATE SCREEN ========== -->
 <section id="gate">
   <div>
-    <p>Somebody made something just for you 💌</p>
+    <p>Something was made just for you 🎁</p>
     <button class="btn-surprise" id="surpriseBtn">SURPRISE</button>
   </div>
 </section>
 
 <!-- ========== 2. MAIN CONTENT ========== -->
 <main id="main" aria-live="polite">
-  <h1>Happy to see you here 💖</h1>
-  <p class="sub">Press play, then leave me a little note below.</p>
+    <p class="sub">Press play, then leave me a little note below.</p>
 
   <div class="video-wrap">
     <!--
@@ -1057,18 +1056,16 @@
   </div>
 
   <section class="messages">
-    <h2>Leave a message 💬</h2>
+    <h2>Leave a message</h2>
     <form id="form" autocomplete="off">
-      <input type="text" id="msg" maxlength="200" placeholder="Write something sweet…" aria-label="Your message" required>
-      <button class="btn-send" type="submit">Send 💌</button>
+      <input type="text" id="msg" maxlength="200" placeholder="Write a message…" aria-label="Your message" required>
+      <button class="btn-send" type="submit">Send</button>
     </form>
-    <p class="thanks" id="thanks">Sent with love! 💕</p>
+    <p class="thanks" id="thanks">Message sent! ✓</p>
     <ul id="list"></ul>
     <p class="empty" id="empty">No messages yet. Be the first!</p>
   </section>
 </main>
-
-<footer>Made with love <b>♥</b></footer>
 
 <button class="mute" id="mute" aria-label="Mute music">🔊</button>
 <audio id="music" loop></audio>
@@ -1114,12 +1111,12 @@
   });
 
   /* ---------- 1. SURPRISE: confetti + reveal ---------- */
-  const COLORS = ["#ff5c8a", "#ffb3c7", "#ffd166", "#9be7c4", "#8ecbff", "#c9a7ff", "#ff9f68"];
+  const COLORS = ["#3b82f6", "#93c5fd", "#ffd166", "#9be7c4", "#8ecbff", "#c9a7ff", "#ff9f68"];
 
   /* Fireworks: a rocket trail shoots up, then explodes into a round burst of sparks.
      Tweak ROCKETS for a longer/shorter show. */
   const FIREWORK_COLORS = [["#ffe27a", "#fff6c9"], ["#ffffff", "#d9f1ff"], ["#9be7ff", "#ffffff"],
-                           ["#d9b8ff", "#ffffff"], ["#ffd1e0", "#ffffff"], ["#b8ffd9", "#ffffff"]];
+                           ["#d9b8ff", "#ffffff"], ["#bfdbfe", "#ffffff"], ["#b8ffd9", "#ffffff"]];
   const ROCKETS = 14;
 
   function launchFireworks() {
