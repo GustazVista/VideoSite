@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A little surprise for you 🎁</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Маленький сюрприз для тебя 🎁</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- Confetti library (canvas-confetti 1.9.3, ISC license) is built in below, so no internet is needed for it -->
 <script>
 // canvas-confetti v1.9.3 built on 2024-04-30T22:19:17.794Z
@@ -918,7 +918,7 @@
                 var(--bg);
     background-attachment: fixed;
   }
-  h1, h2, .btn-surprise { font-family: "Fredoka", "Nunito", sans-serif; }
+  h1, h2, .btn-surprise { font-family: "Rubik", "Nunito", sans-serif; }
 
   /* ---------- 1. Landing / gate ---------- */
   #gate {
@@ -949,35 +949,18 @@
   }
   main.show { opacity: 1; transform: none; }
   h1 { text-align: center; font-size: clamp(1.9rem, 6vw, 2.8rem); color: var(--accent); }
-  .sub { text-align: center; margin: 8px 0 28px; }
 
-  /* Video */
-  .video-wrap {
-    position: relative; aspect-ratio: 16 / 9; background: #0f172a;
-    border-radius: 28px; overflow: hidden; box-shadow: var(--shadow);
-    border: 6px solid #fff;
+  /* Developer note (text is set in DEVELOPER_NOTE in the script, so only the site owner can change it) */
+  .dev-note {
+    background: var(--card); border-radius: 22px; padding: 18px 22px;
+    border-left: 6px solid var(--accent); box-shadow: var(--shadow);
   }
-  video { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .play-overlay {
-    position: absolute; inset: 0; display: grid; place-items: center;
-    background: rgba(15, 23, 42, .3); border: 0; cursor: pointer;
-    transition: opacity .3s;
-  }
-  .play-overlay span {
-    width: 84px; height: 84px; border-radius: 50%; background: #fff; color: var(--accent);
-    display: grid; place-items: center; font-size: 2rem; padding-left: 6px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.3);
-  }
-  .play-overlay.gone { opacity: 0; pointer-events: none; }
-  .placeholder {   /* shown only if VIDEO_SRC is empty or fails to load */
-    position: absolute; inset: 0; display: none; place-items: center; text-align: center;
-    padding: 20px; color: #e2e8f0; background: #1e293b;
-  }
-  .placeholder.on { display: grid; }
-  .placeholder code { background: rgba(255,255,255,.15); padding: 2px 8px; border-radius: 8px; }
+  .dev-note small { display: block; font-weight: 700; color: var(--accent); text-transform: uppercase;
+                    letter-spacing: .08em; font-size: .75rem; margin-bottom: 6px; }
+  .dev-note p { white-space: pre-line; overflow-wrap: anywhere; }
 
   /* Messages */
-  .messages { margin-top: 44px; }
+  .messages { margin-top: 36px; }
   h2 { text-align: center; font-size: 1.7rem; }
   form { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
   input[type=text] {
@@ -993,7 +976,7 @@
   }
   .btn-send:hover { transform: translateY(-2px); }
   .btn-send:active { transform: scale(.96); }
-  .btn-send:focus-visible, .mute:focus-visible, .play-overlay:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .btn-send:focus-visible, .mute:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
   .thanks { text-align: center; height: 1.6em; margin-top: 12px; font-weight: 700; color: var(--accent); opacity: 0; }
   .thanks.pop { animation: pop 1.8s ease; }
   @keyframes pop { 0% { opacity: 0; transform: scale(.6); } 15% { opacity: 1; transform: scale(1.15); } 30%, 80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
@@ -1029,72 +1012,54 @@
 <!-- ========== 1. GATE SCREEN ========== -->
 <section id="gate">
   <div>
-    <p>Something was made just for you 🎁</p>
-    <button class="btn-surprise" id="surpriseBtn">SURPRISE</button>
+    <p>Это сделано специально для тебя 🎁</p>
+    <button class="btn-surprise" id="surpriseBtn">СЮРПРИЗ</button>
   </div>
 </section>
 
 <!-- ========== 2. MAIN CONTENT ========== -->
 <main id="main" aria-live="polite">
-    <p class="sub">Press play, then leave me a little note below.</p>
-
-  <div class="video-wrap">
-    <!--
-      ╔══════════════════════════════════════════════════════════╗
-      ║  YOUR VIDEO GOES HERE                                    ║
-      ║  1. Put your video file (e.g. my-video.mp4) in the SAME  ║
-      ║     folder as this HTML file.                            ║
-      ║  2. Change VIDEO_SRC in the <script> below to its name   ║
-      ║     (or paste a full https:// link to an .mp4).          ║
-      ╚══════════════════════════════════════════════════════════╝
-    -->
-    <video id="video" controls playsinline preload="metadata"></video>
-    <button class="play-overlay" id="playBtn" aria-label="Play video"><span>▶</span></button>
-    <div class="placeholder" id="placeholder">
-      <p>🎬 Your video goes here.<br>Set <code>VIDEO_SRC</code> in the script to your file name.</p>
-    </div>
-  </div>
+    <!-- Заметка разработчика: текст меняется только в файле (DEVELOPER_NOTE в скрипте) -->
+  <aside class="dev-note" id="devNote" hidden>
+    <small>Заметка разработчика</small>
+    <p id="devNoteText"></p>
+  </aside>
 
   <section class="messages">
-    <h2>Leave a message</h2>
+    <h2>Оставь сообщение</h2>
     <form id="form" autocomplete="off">
-      <input type="text" id="msg" maxlength="200" placeholder="Write a message…" aria-label="Your message" required>
-      <button class="btn-send" type="submit">Send</button>
+      <input type="text" id="msg" maxlength="200" placeholder="Напиши сообщение…" aria-label="Твоё сообщение" required>
+      <button class="btn-send" type="submit">Отправить</button>
     </form>
-    <p class="thanks" id="thanks">Message sent! ✓</p>
+    <p class="thanks" id="thanks">Сообщение отправлено! ✓</p>
     <ul id="list"></ul>
-    <p class="empty" id="empty">No messages yet. Be the first!</p>
+    <p class="empty" id="empty">Пока нет сообщений. Будь первым!</p>
   </section>
 </main>
 
-<button class="mute" id="mute" aria-label="Mute music">🔊</button>
+<button class="mute" id="mute" aria-label="Выключить музыку">🔊</button>
 <audio id="music" loop></audio>
 
 <script>
-  /* =====================  SETTINGS — EDIT THESE  ===================== */
-  const VIDEO_SRC  = "";   // e.g. "my-video.mp4" (file next to this HTML) or "https://.../video.mp4"
-  const VIDEO_POSTER = ""; // optional cover image, e.g. "cover.jpg"
-  const MUSIC_SRC  = "";   // optional background music, e.g. "song.mp3". Leave "" for no music.
-  const MUSIC_VOLUME = 0.3; // 0 to 1
-  const STORAGE_KEY = "surprise-messages"; // messages are saved in this browser only
+  /* =====================  НАСТРОЙКИ — МЕНЯЙ ЗДЕСЬ  ===================== */
+  // Заметка разработчика. Видна всем посетителям, но изменить её можно только
+  // здесь, в коде (у посетителей на странице нет поля для её редактирования).
+  // Оставь "" (пусто), чтобы скрыть заметку. \n = новая строка.
+  const DEVELOPER_NOTE = "Привет! Это моя заметка. Измени этот текст в файле, и он обновится на странице.";
+
+  const MUSIC_SRC  = "";   // фоновая музыка (необязательно), например "song.mp3". "" = без музыки
+  const MUSIC_VOLUME = 0.3; // громкость от 0 до 1
+  const STORAGE_KEY = "surprise-messages"; // сообщения хранятся только в браузере посетителя
   /* ================================================================== */
 
   const $ = id => document.getElementById(id);
-  const gate = $("gate"), main = $("main"), video = $("video"), music = $("music");
+  const gate = $("gate"), main = $("main"), music = $("music");
 
-  /* ---------- Video setup ---------- */
-  if (VIDEO_SRC) {
-    video.src = VIDEO_SRC;
-    if (VIDEO_POSTER) video.poster = VIDEO_POSTER;
-    video.addEventListener("error", () => $("placeholder").classList.add("on"));
-  } else {
-    $("placeholder").classList.add("on");
-    $("playBtn").classList.add("gone");
+  /* ---------- Developer note ---------- */
+  if (DEVELOPER_NOTE.trim()) {
+    $("devNoteText").textContent = DEVELOPER_NOTE;   // textContent = safe, no HTML injection
+    $("devNote").hidden = false;
   }
-  $("playBtn").addEventListener("click", () => video.play());
-  video.addEventListener("play",  () => { $("playBtn").classList.add("gone"); music.pause(); });
-  video.addEventListener("pause", () => { if (!video.ended) $("playBtn").classList.remove("gone"); });
-  video.addEventListener("ended", () => { $("playBtn").classList.remove("gone"); startMusic(); });
 
   /* ---------- Music ---------- */
   function startMusic() {
@@ -1106,8 +1071,8 @@
   $("mute").addEventListener("click", () => {
     muted = !muted;
     $("mute").textContent = muted ? "🔇" : "🔊";
-    $("mute").setAttribute("aria-label", muted ? "Unmute music" : "Mute music");
-    muted ? music.pause() : (video.paused && startMusic());
+    $("mute").setAttribute("aria-label", muted ? "Включить музыку" : "Выключить музыку");
+    muted ? music.pause() : startMusic();
   });
 
   /* ---------- 1. SURPRISE: confetti + reveal ---------- */
@@ -1175,7 +1140,7 @@
       li.textContent = m.text;                       // textContent keeps user input safe
       if (m.id === newId) li.classList.add("new");
       const t = document.createElement("time");
-      t.textContent = new Date(m.id).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+      t.textContent = new Date(m.id).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" });
       li.appendChild(t);
       list.appendChild(li);
     });
