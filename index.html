@@ -986,11 +986,25 @@
     background: var(--card); border-radius: 20px 20px 20px 6px; padding: 14px 18px;
     box-shadow: 0 6px 18px rgba(15,23,42,.08); overflow-wrap: anywhere;
   }
+  li { position: relative; padding-right: 48px; }
+  .del {
+    position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 50%;
+    background: transparent; color: var(--ink); opacity: .45; font-size: 1.3rem; line-height: 1; cursor: pointer;
+    transition: opacity .2s, background .2s;
+  }
+  .del:hover, .del:focus-visible { opacity: 1; background: var(--line); outline: none; }
+  li.removing { opacity: 0; transform: translateX(24px); transition: opacity .25s, transform .25s; }
   li.new { animation: drop .6s cubic-bezier(.3, 1.6, .5, 1); }
   li time { display: block; font-size: .78rem; opacity: .6; margin-top: 4px; }
   @keyframes drop { from { opacity: 0; transform: translateY(-14px) scale(.95); } }
   .empty { text-align: center; opacity: .65; margin-top: 14px; }
 
+  .note { text-align: center; font-size: .85rem; opacity: .65; margin-top: 10px; }
+  .admin { margin-top: 40px; text-align: center; font-size: .85rem; opacity: .6; }
+  .admin summary { cursor: pointer; }
+  .admin form { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+  .admin input { flex: 1 1 150px; font: inherit; padding: 8px 14px; border: 2px solid var(--line); border-radius: 999px; }
+  .admin button { font: inherit; padding: 8px 16px; border: 0; border-radius: 999px; background: var(--ink); color: #fff; cursor: pointer; }
   footer { text-align: center; padding: 32px 20px 40px; font-size: .95rem; }
   footer b { color: var(--accent); }
 
@@ -1034,7 +1048,18 @@
     <p class="thanks" id="thanks">Сообщение отправлено! ✓</p>
     <ul id="list"></ul>
     <p class="empty" id="empty">Пока нет сообщений. Будь первым!</p>
+    <p class="note" id="localNote" hidden>Сообщения сохраняются только на этом устройстве.</p>
   </section>
+
+  <!-- Вход для владельца (виден только когда работает сервер): после входа появляются кнопки удаления -->
+  <details class="admin" id="admin" hidden>
+    <summary>Владелец</summary>
+    <form id="loginForm">
+      <input type="password" id="adminPass" placeholder="Пароль владельца" autocomplete="current-password" required>
+      <button type="submit" id="loginBtn">Войти</button>
+    </form>
+    <p id="adminMsg"></p>
+  </details>
 </main>
 
 <button class="mute" id="mute" aria-label="Выключить музыку">🔊</button>
@@ -1045,7 +1070,11 @@
   // Заметка разработчика. Видна всем посетителям, но изменить её можно только
   // здесь, в коде (у посетителей на странице нет поля для её редактирования).
   // Оставь "" (пусто), чтобы скрыть заметку. \n = новая строка.
-  const DEVELOPER_NOTE = "Во-первых, понравилось ли тебе то оригами? Во-вторых, какой кофе ты любишь? Я слышал, что это многое говорит о человеке.";
+  const DEVELOPER_NOTE = "Привет! Это моя заметка. Измени этот текст в файле, и он обновится на странице.";
+
+  // Сообщения общие для всех: они хранятся на сервере через /api/messages (см. папку api).
+  // Если открыть файл просто с компьютера (без Vercel), сообщения хранятся только в браузере.
+  const API_URL = "/api/messages";
 
   const MUSIC_SRC  = "";   // фоновая музыка (необязательно), например "song.mp3". "" = без музыки
   const MUSIC_VOLUME = 0.3; // громкость от 0 до 1
@@ -1127,44 +1156,134 @@
     }, 1300);
   });
 
-  /* ---------- 2. Messages (saved in localStorage) ---------- */
-  const list = $("list"), empty = $("empty");
-  let messages = [];
-  try { messages = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (_) {}
+  /* ---------- 2. Сообщения ----------
+     • Сервер работает (Vercel /api/messages) → сообщения общие, удалять может только владелец.
+     • Сервера нет (файл открыт с компьютера) → сообщения только в этом браузере (localStorage). */
+  const list = $("list"), empty = $("empty"), thanks = $("thanks");
+  let cloud = false;            // true, когда сервер ответил
+  let isOwner = false;          // можно ли показывать кнопки удаления
+  let adminPass = "";
+  try { adminPass = sessionStorage.getItem("adminPass") || ""; } catch (_) {}
+  let messages = [];            // [{ id, text, time: Date }]
+  let seen = null, lastSig = "", lastSent = 0;
 
-  function render(newId) {
+  function render(newIds) {
     list.innerHTML = "";
     empty.style.display = messages.length ? "none" : "block";
-    messages.forEach(m => {   // newest first (we unshift on submit)
+    messages.forEach(m => {     // сначала новые
       const li = document.createElement("li");
-      li.textContent = m.text;                       // textContent keeps user input safe
-      if (m.id === newId) li.classList.add("new");
+      li.textContent = m.text;                       // textContent = безопасно
+      if (newIds && newIds.has(m.id)) li.classList.add("new");
       const t = document.createElement("time");
-      t.textContent = new Date(m.id).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" });
+      t.textContent = m.time.toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" });
       li.appendChild(t);
+      if (isOwner) {                                 // кнопка удаления
+        const del = document.createElement("button");
+        del.className = "del"; del.textContent = "×";
+        del.setAttribute("aria-label", "Удалить сообщение");
+        del.addEventListener("click", () => {
+          li.classList.add("removing");
+          setTimeout(() => removeMessage(m), 250);
+        });
+        li.appendChild(del);
+      }
       list.appendChild(li);
     });
   }
 
-  $("form").addEventListener("submit", e => {
+  function flash(text) {          // короткое сообщение под формой + анимация
+    thanks.textContent = text;
+    thanks.classList.remove("pop"); void thanks.offsetWidth; thanks.classList.add("pop");
+  }
+
+  async function api(method, body) {
+    const r = await fetch(API_URL, {
+      method,
+      headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!r.ok) throw new Error(String(r.status));
+    return r.json();
+  }
+
+  /* ----- Режим сервера ----- */
+  function adminUI() {
+    $("admin").hidden = false;
+    $("loginForm").style.display = isOwner ? "none" : "";
+    $("adminMsg").innerHTML = "";
+    if (isOwner) {
+      const out = document.createElement("button");
+      out.textContent = "Выйти"; out.type = "button";
+      out.addEventListener("click", () => {
+        adminPass = ""; try { sessionStorage.removeItem("adminPass"); } catch (_) {}
+        load();
+      });
+      $("adminMsg").append("Вы вошли как владелец. ", out);
+    }
+  }
+
+  async function load(first) {
+    try {
+      const d = await api("GET");
+      cloud = true; isOwner = !!d.admin;
+      messages = d.messages.map(m => ({ id: m.id, text: m.text, time: new Date(m.time) }));
+      $("localNote").hidden = true;
+      const sig = messages.map(m => m.id).join() + "|" + isOwner;
+      if (sig === lastSig) return;                  // ничего не изменилось
+      lastSig = sig;
+      const fresh = new Set(seen ? messages.filter(m => !seen.has(m.id)).map(m => m.id) : []);
+      seen = new Set(messages.map(m => m.id));
+      adminUI(); render(fresh);
+    } catch (_) { if (first) startLocal(); }
+  }
+
+  /* ----- Локальный режим ----- */
+  function saveLocal() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.map(m => ({ id: m.id, text: m.text })))); } catch (_) {}
+  }
+  function startLocal() {
+    isOwner = true;             // на своём устройстве можно удалять свои сообщения
+    try { messages = (JSON.parse(localStorage.getItem(STORAGE_KEY)) || []).map(m => ({ ...m, time: new Date(m.id) })); } catch (_) {}
+    $("localNote").hidden = false;
+    render();
+  }
+
+  function removeMessage(m) {
+    if (cloud) { api("DELETE", { id: m.id }).then(() => load()).catch(() => { flash("Не удалось удалить"); render(); }); return; }
+    messages = messages.filter(x => x.id !== m.id); saveLocal(); render();
+  }
+
+  $("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    adminPass = $("adminPass").value; $("adminPass").value = "";
+    lastSig = ""; await load();
+    if (isOwner) { try { sessionStorage.setItem("adminPass", adminPass); } catch (_) {} }
+    else { adminPass = ""; $("adminMsg").textContent = "Неверный пароль"; }
+  });
+
+  $("form").addEventListener("submit", async e => {
     e.preventDefault();
     const text = $("msg").value.trim();
-    if (!text) return;
-    const msg = { id: Date.now(), text };
-    messages.unshift(msg);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages)); } catch (_) {}
+    if (!text || Date.now() - lastSent < 4000) return;   // защита от спама
+    lastSent = Date.now();
     $("msg").value = "";
-    render(msg.id);
 
-    // Success animation: "Sent!" pop + a few hearts of confetti
-    const th = $("thanks"); th.classList.remove("pop"); void th.offsetWidth; th.classList.add("pop");
+    if (cloud) {
+      try { await api("POST", { text }); flash("Сообщение отправлено! ✓"); load(); }
+      catch (err) { flash(err.message === "429" ? "Подождите пару секунд" : "Не удалось отправить"); return; }
+    } else {
+      const m = { id: Date.now(), text, time: new Date() };
+      messages.unshift(m); saveLocal(); render(new Set([m.id]));
+      flash("Сообщение отправлено! ✓");
+    }
     if (window.confetti) {
       confetti({ particleCount: 30, spread: 70, startVelocity: 25, origin: { y: .8 }, colors: COLORS,
                  shapes: ["circle"], scalar: .8 });
     }
   });
 
-  render();
+  load(true);
+  setInterval(() => { if (cloud && !document.hidden) load(); }, 15000);   // подтягиваем новые сообщения
 </script>
 </body>
 </html>
