@@ -7,10 +7,9 @@
 import { Redis } from "@upstash/redis";
 
 // Vercel's Redis integration injects one of these pairs of variables.
-const redis = new Redis({
-  url:   process.env.UPSTASH_REDIS_REST_URL   || process.env.KV_REST_API_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
-});
+const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL   || process.env.KV_REST_API_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+const redis = REDIS_URL && REDIS_TOKEN ? new Redis({ url: REDIS_URL, token: REDIS_TOKEN }) : null;
 
 const INDEX = "msg:index";   // sorted set: id scored by time (for ordering)
 const DATA  = "msg:data";    // hash: id -> { text }
@@ -62,8 +61,11 @@ export default async function handler(req, res) {
     }
 
     res.setHeader("Allow", "GET, POST, DELETE");
+      if (!redis) {
+    return res.status(500).json({ error: "no database", hint: "Connect an Upstash Redis database to this Vercel project, then redeploy." });
+  }
     return res.status(405).json({ error: "method not allowed" });
   } catch (e) {
-    return res.status(500).json({ error: "server error" });
+        return res.status(500).json({ error: "server error", hint: String((e && e.message) || e).slice(0, 120) });
   }
 }
